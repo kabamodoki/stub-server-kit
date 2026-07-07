@@ -1,0 +1,17 @@
+# 環境変数ファイル（コミット禁止）
+.local.env
+*.local.env
+
+# Maven
+stub/target/
+stub/.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,10 @@
+# デフォルト設定（config/application.yml で上書き可能）
+server:
+  port: 3132
+
+stub:
+  routes-file: config/routes.yaml
+  auth:
+    login-path: /login
+    default-token: stub-token-123
+    token-param: token

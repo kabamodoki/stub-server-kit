@@ -1,0 +1,14 @@
+# stub サーバー設定
+# このファイルは config/ に置くことで Spring Boot が自動的に読み込みます。
+# src/main/resources/application.yml のデフォルト値を上書きします。
+
+server:
+  port: 3132
+
+stub:
+  routes-file: config/routes.yaml
+
+  auth:
+    login-path: /login
+    default-token: stub-token-123
+    token-param: token

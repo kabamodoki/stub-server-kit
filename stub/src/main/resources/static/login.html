@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stub Login</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 40px;
+      width: 360px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .badge {
+      display: inline-block;
+      background: #ff6b35;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: #555; margin-bottom: 6px; }
+    input[type="text"], input[type="password"] {
+      width: 100%; padding: 10px 12px; border: 1px solid #ddd;
+      border-radius: 8px; font-size: 14px; color: #aaa; background: #fafafa;
+    }
+    button[type="submit"] {
+      width: 100%; padding: 12px; background: #4f46e5; color: #fff;
+      border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+      cursor: pointer; margin-top: 8px; transition: background 0.2s;
+    }
+    button[type="submit"]:hover { background: #4338ca; }
+    button[type="submit"]:disabled { background: #ccc; cursor: not-allowed; }
+    .info-box {
+      margin-top: 20px; padding: 12px; border-radius: 8px;
+      font-size: 12px; word-break: break-all;
+    }
+    .info-redirect { background: #f8f9ff; border: 1px solid #e0e3ff; color: #555; }
+    .info-redirect strong { color: #4f46e5; }
+    .info-warn { background: #fff8f0; border: 1px solid #ffe0c0; color: #c06000; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">STUB</div>
+    <h1>Pseudo Login</h1>
+    <p class="subtitle">開発用スタブ認証ページ</p>
+
+    <form method="POST" action="/login/submit" id="loginForm">
+      <input type="hidden" id="redirectUri" name="redirect_uri">
+      <input type="hidden" id="state" name="state">
+
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" value="stub-user" readonly tabindex="-1">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" value="stub-pass" readonly tabindex="-1">
+      </div>
+
+      <button type="submit" id="loginBtn">ログイン（スタブ）</button>
+    </form>
+
+    <div id="info"></div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const redirectUri = params.get('redirect_uri') || '';
+    const state = params.get('state') || '';
+
+    document.getElementById('redirectUri').value = redirectUri;
+    document.getElementById('state').value = state;
+
+    const infoEl = document.getElementById('info');
+    if (redirectUri) {
+      infoEl.innerHTML = `
+        <div class="info-box info-redirect">
+          <strong>リダイレクト先</strong><br>${redirectUri}
+          ${state ? `<br><strong>state</strong>: ${state}` : ''}
+        </div>`;
+    } else {
+      document.getElementById('loginBtn').disabled = true;
+      infoEl.innerHTML = `
+        <div class="info-box info-warn">
+          redirect_uri が指定されていません。<br>
+          ログインしても何も起きません。
+        </div>`;
+    }
+  </script>
+</body>
+</html>

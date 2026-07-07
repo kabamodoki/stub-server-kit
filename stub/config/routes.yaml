@@ -1,0 +1,73 @@
+# routes.yaml — APIスタブ定義
+#
+# フィールド:
+#   method   : GET / POST / PUT / PATCH / DELETE
+#   path     : URLパス（Express形式、:id 等のパラメータ可）
+#   delay    : レスポンス遅延（ミリ秒）省略可
+#   response:
+#     status : HTTPステータスコード（デフォルト: 200）
+#     body   : JSONレスポンスボディ
+#     headers: 追加レスポンスヘッダー（省略可）
+
+routes:
+  # ヘルスチェック
+  - method: GET
+    path: /api/health
+    response:
+      status: 200
+      body:
+        status: ok
+
+  # ユーザー一覧
+  - method: GET
+    path: /api/users
+    response:
+      status: 200
+      body:
+        - id: 1
+          name: Stub User
+          email: stub@example.com
+          role: admin
+        - id: 2
+          name: Another User
+          email: another@example.com
+          role: user
+
+  # ユーザー詳細
+  - method: GET
+    path: /api/users/:id
+    response:
+      status: 200
+      body:
+        id: 1
+        name: Stub User
+        email: stub@example.com
+
+  # ユーザー作成
+  - method: POST
+    path: /api/users
+    response:
+      status: 201
+      body:
+        id: 3
+        message: created
+
+  # トークン取得（OAuth等）
+  - method: POST
+    path: /api/auth/token
+    response:
+      status: 200
+      body:
+        access_token: stub-access-token-xyz
+        token_type: Bearer
+        expires_in: 3600
+
+  # 遅延レスポンスのサンプル
+  - method: GET
+    path: /api/items
+    delay: 500
+    response:
+      status: 200
+      body:
+        items: []
+        total: 0
