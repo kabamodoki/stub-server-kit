@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,10 +29,13 @@ public class AuthController {
     @Autowired
     private RouteLoader routeLoader;
 
-    /** 疑似ログインページを表示します */
-    @GetMapping("${stub.auth.login-path:/login}")
-    public String loginPage() {
-        return "forward:/login.html";
+    /** 疑似ログインページを表示します（/** に横取りされないよう直接返す） */
+    @GetMapping(value = "${stub.auth.login-path:/login}", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<byte[]> loginPage() throws IOException {
+        byte[] html = new ClassPathResource("static/login.html").getInputStream().readAllBytes();
+        return ResponseEntity.ok()
+                .header("Content-Type", "text/html;charset=UTF-8")
+                .body(html);
     }
 
     /** ログインボタン押下 → redirect_uri へリダイレクト */
