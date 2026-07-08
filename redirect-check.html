@@ -224,9 +224,13 @@
 </div>
 
 <script>
-  // このページのURLをredirect_uriに設定（クエリなしのベースURL）
-  const baseUrl = location.origin + location.pathname;
-  document.getElementById('redirectUri').value = baseUrl;
+  // redirect_uri は stub サーバーの /stub/callback に固定
+  // （file:// から http:// へのリダイレクトはブラウザにブロックされるため）
+  const stubUrlEl = document.getElementById('stubUrl');
+  document.getElementById('redirectUri').value = stubUrlEl.value.trim() + '/stub/callback';
+  stubUrlEl.addEventListener('input', () => {
+    document.getElementById('redirectUri').value = stubUrlEl.value.trim() + '/stub/callback';
+  });
 
   // ページロード時：リダイレクトで戻ってきた場合はパラメータを表示
   const params = new URLSearchParams(location.search);
@@ -253,7 +257,7 @@
     sessionStorage.setItem('stub_url', stubUrl);
     sessionStorage.setItem('login_path', loginPath);
 
-    const redirectUri = encodeURIComponent(baseUrl);
+    const redirectUri = encodeURIComponent(document.getElementById('redirectUri').value);
     const url = `${stubUrl}${loginPath}?redirect_uri=${redirectUri}&state=${encodeURIComponent(state)}`;
     location.href = url;
   }
