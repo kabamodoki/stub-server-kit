@@ -6,9 +6,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
+import stub.config.StubProperties;
 import stub.model.RouteDefinition;
 import stub.model.RoutesConfig;
 
@@ -23,15 +23,17 @@ public class RouteLoader {
 
     private static final Logger log = LoggerFactory.getLogger(RouteLoader.class);
 
-    @Value("${stub.routes-file:config/routes.yaml}")
-    private String routesFile;
-
+    private final StubProperties stubProperties;
     private List<RouteDefinition> routes = new ArrayList<>();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
+    public RouteLoader(StubProperties stubProperties) {
+        this.stubProperties = stubProperties;
+    }
+
     @PostConstruct
     public void load() throws IOException {
-        File file = new File(routesFile);
+        File file = new File(stubProperties.getRoutesFile());
         if (!file.exists()) {
             log.warn("Routes file not found: {}", file.getAbsolutePath());
             return;
@@ -49,8 +51,10 @@ public class RouteLoader {
     }
 
     public Optional<RouteDefinition> findRoute(String method, String path) {
+        if (path == null) return Optional.empty();
         return routes.stream()
                 .filter(r -> r.getMethod().equalsIgnoreCase(method))
+                .filter(r -> r.getPath() != null)
                 .filter(r -> pathMatcher.match(toAntPattern(r.getPath()), path))
                 .findFirst();
     }

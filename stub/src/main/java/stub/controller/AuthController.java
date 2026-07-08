@@ -28,13 +28,13 @@ public class AuthController {
     private RouteLoader routeLoader;
 
     /** 疑似ログインページを表示します */
-    @GetMapping("/login")
+    @GetMapping("${stub.auth.login-path:/login}")
     public String loginPage() {
         return "forward:/login.html";
     }
 
     /** ログインボタン押下 → redirect_uri へリダイレクト */
-    @PostMapping("/login/submit")
+    @PostMapping("${stub.auth.login-path:/login}/submit")
     public void loginSubmit(
             @RequestParam(required = false) String redirect_uri,
             @RequestParam(required = false) String state,

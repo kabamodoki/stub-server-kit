@@ -62,7 +62,7 @@
     <h1>Pseudo Login</h1>
     <p class="subtitle">開発用スタブ認証ページ</p>
 
-    <form method="POST" action="/login/submit" id="loginForm">
+    <form method="POST" id="loginForm">
       <input type="hidden" id="redirectUri" name="redirect_uri">
       <input type="hidden" id="state" name="state">
 
@@ -82,6 +82,10 @@
   </div>
 
   <script>
+    // フォームの送信先を現在のパス + /submit に動的に設定
+    // login-path を変更しても自動で追従する
+    document.getElementById('loginForm').action = window.location.pathname + '/submit';
+
     const params = new URLSearchParams(window.location.search);
     const redirectUri = params.get('redirect_uri') || '';
     const state = params.get('state') || '';

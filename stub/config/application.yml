@@ -9,6 +9,6 @@ stub:
   routes-file: config/routes.yaml
 
   auth:
-    login-path: /login
+    login-path: /login      # 疑似ログインの受付URL。変更した場合は再起動が必要。
     default-token: stub-token-123
     token-param: token
