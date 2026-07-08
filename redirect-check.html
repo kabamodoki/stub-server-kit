@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirect Check — stub-server-kit</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #2d2d2d;
+    }
+
+    .wrap { max-width: 640px; margin: 0 auto; }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: #ff6b35;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+
+    .card h2 { font-size: 14px; font-weight: 700; color: #555; margin-bottom: 16px; }
+
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px; }
+
+    .field input[type="text"] {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'Cascadia Code', Consolas, monospace;
+      color: #2d2d2d;
+      background: #fafafa;
+    }
+
+    .field input[type="text"]:focus {
+      outline: none;
+      border-color: #4f46e5;
+      background: #fff;
+    }
+
+    .field .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary { background: #4f46e5; color: #fff; }
+    .btn-primary:hover { background: #4338ca; }
+
+    .btn-ghost {
+      background: #f0f2f5;
+      color: #555;
+      font-size: 13px;
+      padding: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-ghost:hover { background: #e5e7eb; }
+
+    /* 結果エリア */
+    .result-card {
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .result-card.success {
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
+    }
+
+    .result-card.error {
+      background: #fff1f2;
+      border: 2px solid #f43f5e;
+    }
+
+    .result-card h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-card.success h2 { color: #15803d; }
+    .result-card.error h2 { color: #be123c; }
+
+    .param-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .param-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    .param-key {
+      font-size: 12px;
+      font-weight: 700;
+      color: #4f46e5;
+      font-family: 'Cascadia Code', Consolas, monospace;
+      min-width: 100px;
+      flex-shrink: 0;
+    }
+
+    .param-val {
+      font-size: 13px;
+      font-family: 'Cascadia Code', Consolas, monospace;
+      color: #2d2d2d;
+      word-break: break-all;
+    }
+
+    .state-match {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .state-match.ok { background: #dcfce7; color: #15803d; }
+    .state-match.ng { background: #ffe4e6; color: #be123c; }
+
+    .how {
+      background: #f8f9ff;
+      border: 1px solid #e0e3ff;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 12px;
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .how strong { color: #4f46e5; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1><span class="badge">CHECK</span> Redirect Check</h1>
+  <p class="subtitle">疑似ログインのリダイレクト動作を検証するツール</p>
+
+  <div class="how">
+    <strong>使い方：</strong>
+    stub サーバーの URL とログインパスを入力して「テスト開始」を押すと、<br>
+    このページ自体をリダイレクト先として疑似ログインを実行します。<br>
+    ログイン後にこのページへ戻り、返却されたパラメータを表示します。
+  </div>
+
+  <!-- 結果表示エリア（リダイレクト後に表示） -->
+  <div id="result" style="display:none;"></div>
+
+  <!-- 設定フォーム -->
+  <div class="card" id="formCard">
+    <h2>テスト設定</h2>
+
+    <div class="field">
+      <label>Stub サーバー URL</label>
+      <input type="text" id="stubUrl" value="http://localhost:3132">
+    </div>
+
+    <div class="field">
+      <label>ログインパス</label>
+      <input type="text" id="loginPath" value="/login">
+      <div class="hint">config/application.yml の stub.auth.login-path に合わせてください</div>
+    </div>
+
+    <div class="field">
+      <label>state（任意）</label>
+      <input type="text" id="stateVal" placeholder="空欄の場合は自動生成">
+      <div class="hint">OAuth の state パラメータ。返却値と一致するか検証します。</div>
+    </div>
+
+    <div class="field">
+      <label>redirect_uri（このページのURL・自動設定）</label>
+      <input type="text" id="redirectUri" readonly style="color:#aaa;">
+    </div>
+
+    <button class="btn btn-primary" onclick="startTest()">テスト開始</button>
+    <button class="btn btn-ghost" onclick="clearResult()">結果をクリア</button>
+  </div>
+
+</div>
+
+<script>
+  // このページのURLをredirect_uriに設定（クエリなしのベースURL）
+  const baseUrl = location.origin + location.pathname;
+  document.getElementById('redirectUri').value = baseUrl;
+
+  // ページロード時：リダイレクトで戻ってきた場合はパラメータを表示
+  const params = new URLSearchParams(location.search);
+  if (params.toString()) {
+    showResult(params);
+  }
+
+  function startTest() {
+    const stubUrl   = document.getElementById('stubUrl').value.trim();
+    const loginPath = document.getElementById('loginPath').value.trim();
+    let   state     = document.getElementById('stateVal').value.trim();
+
+    if (!stubUrl || !loginPath) {
+      alert('Stub サーバー URL とログインパスを入力してください。');
+      return;
+    }
+
+    // state が空なら自動生成してセッションに保持
+    if (!state) {
+      state = 'check-' + Math.random().toString(36).slice(2, 10);
+      document.getElementById('stateVal').value = state;
+    }
+    sessionStorage.setItem('check_state', state);
+    sessionStorage.setItem('stub_url', stubUrl);
+    sessionStorage.setItem('login_path', loginPath);
+
+    const redirectUri = encodeURIComponent(baseUrl);
+    const url = `${stubUrl}${loginPath}?redirect_uri=${redirectUri}&state=${encodeURIComponent(state)}`;
+    location.href = url;
+  }
+
+  function showResult(params) {
+    const sentState     = sessionStorage.getItem('check_state') || '';
+    const stubUrl       = sessionStorage.getItem('stub_url') || 'http://localhost:3132';
+    const loginPath     = sessionStorage.getItem('login_path') || '/login';
+    const receivedState = params.get('state') || '';
+    const stateOk       = sentState && receivedState === sentState;
+
+    // フォームに前回の設定を復元
+    document.getElementById('stubUrl').value   = stubUrl;
+    document.getElementById('loginPath').value = loginPath;
+    if (sentState) document.getElementById('stateVal').value = sentState;
+
+    // パラメータ一覧を組み立て
+    let rows = '';
+    params.forEach((val, key) => {
+      rows += `
+        <div class="param-row">
+          <span class="param-key">${escape(key)}</span>
+          <span class="param-val">${escape(val)}</span>
+        </div>`;
+    });
+
+    // state 検証結果
+    let stateCheck = '';
+    if (sentState) {
+      stateCheck = stateOk
+        ? `<div class="state-match ok">✓ state が一致しています（CSRF対策OK）</div>`
+        : `<div class="state-match ng">✗ state が一致しません（送信: ${escape(sentState)} / 受信: ${escape(receivedState || 'なし')}）</div>`;
+    }
+
+    document.getElementById('result').innerHTML = `
+      <div class="result-card success">
+        <h2>✓ リダイレクトを受信しました</h2>
+        <div class="param-list">${rows}</div>
+        ${stateCheck}
+      </div>`;
+    document.getElementById('result').style.display = 'block';
+
+    // URLからパラメータを取り除く（戻るときに再表示しないよう）
+    history.replaceState(null, '', location.pathname);
+  }
+
+  function clearResult() {
+    document.getElementById('result').style.display = 'none';
+    sessionStorage.removeItem('check_state');
+    history.replaceState(null, '', location.pathname);
+  }
+
+  function escape(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
+</body>
+</html>
