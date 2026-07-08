@@ -45,7 +45,7 @@ public class RouteLoader {
         RoutesConfig config = mapper.readValue(file, RoutesConfig.class);
         this.routes = config.getRoutes();
 
-        log.info("Loaded {} route(s) from {}", routes.size(), routesFile);
+        log.info("Loaded {} route(s) from {}", routes.size(), stubProperties.getRoutesFile());
         routes.forEach(r ->
                 log.info("  [STUB] {} {}", r.getMethod().toUpperCase(), r.getPath()));
     }
